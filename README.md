@@ -189,17 +189,16 @@ Para que as migrações automáticas funcionem, configure os seguintes secrets n
 
 Para popular o banco de dados remoto com dados iniciais (produtos, categorias, etc.):
 
-**Via GitHub Actions (recomendado para produção):**
-1. Acesse **Actions** → **Seed Supabase Database**
-2. Clique em **Run workflow**
-3. Escolha se deseja limpar dados existentes (padrão: não limpa)
-4. Execute o workflow
+**Método Simples (Recomendado):**
+```bash
+# Gera arquivo SQL com dados de seed
+pnpm db:seed:sql
+```
 
-**Secrets necessários:**
-- `DATABASE_URL`: Connection string completa do banco remoto
-  - Obtenha em: Dashboard → Settings → Database → Connection string → URI
-  - Copie a connection string completa e adicione como secret `DATABASE_URL` no GitHub
-  - **Dica:** Use a mesma `DATABASE_URL` do seu `.env.local` mas com a senha do banco remoto
+Isso cria o arquivo `drizzle/seed.sql`. Depois:
+1. Abra o **Supabase Dashboard** → **SQL Editor**
+2. Copie o conteúdo de `drizzle/seed.sql`
+3. Cole e execute no SQL Editor
 
 **Local (desenvolvimento):**
 ```bash
