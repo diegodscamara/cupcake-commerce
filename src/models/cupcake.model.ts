@@ -19,41 +19,34 @@ export class CupcakeModel {
       sort?: SortOption;
     }
   ): Promise<Cupcake[]> {
-    let query = db.select().from(cupcakes);
+    const baseQuery = activeOnly
+      ? db.select().from(cupcakes).where(eq(cupcakes.isActive, true))
+      : db.select().from(cupcakes);
 
-    if (activeOnly) {
-      query = query.where(eq(cupcakes.isActive, true)) as typeof query;
-    }
-
-    // Apply sorting
-    if (options?.sort) {
-      switch (options.sort) {
-        case 'name':
-          query = query.orderBy(asc(cupcakes.name)) as typeof query;
-          break;
-        case 'price-asc':
-          query = query.orderBy(asc(cupcakes.price)) as typeof query;
-          break;
-        case 'price-desc':
-          query = query.orderBy(desc(cupcakes.price)) as typeof query;
-          break;
-        case 'newest':
-          query = query.orderBy(desc(cupcakes.createdAt)) as typeof query;
-          break;
-        default:
-          query = query.orderBy(asc(cupcakes.name)) as typeof query;
-      }
-    } else {
-      query = query.orderBy(asc(cupcakes.name)) as typeof query;
+    // Determine sort order
+    let orderByClause;
+    switch (options?.sort) {
+      case 'name':
+        orderByClause = asc(cupcakes.name);
+        break;
+      case 'price-asc':
+        orderByClause = asc(cupcakes.price);
+        break;
+      case 'price-desc':
+        orderByClause = desc(cupcakes.price);
+        break;
+      case 'newest':
+        orderByClause = desc(cupcakes.createdAt);
+        break;
+      default:
+        orderByClause = asc(cupcakes.name);
     }
 
-    // Apply pagination
-    if (options?.limit) {
-      query = query.limit(options.limit) as typeof query;
-    }
-    if (options?.offset) {
-      query = query.offset(options.offset) as typeof query;
-    }
+    // Build query with sorting and pagination in one chain
+    const query = baseQuery
+      .orderBy(orderByClause)
+      .limit(options?.limit ?? Number.MAX_SAFE_INTEGER)
+      .offset(options?.offset ?? 0);
 
     return query;
   }
@@ -171,7 +164,7 @@ export class CupcakeModel {
     }
   ): Promise<Cupcake[]> {
     const searchTerm = `%${query}%`;
-    let dbQuery = db
+    const baseQuery = db
       .select()
       .from(cupcakes)
       .where(
@@ -184,35 +177,30 @@ export class CupcakeModel {
         )
       );
 
-    // Apply sorting
-    if (options?.sort) {
-      switch (options.sort) {
-        case 'name':
-          dbQuery = dbQuery.orderBy(asc(cupcakes.name));
-          break;
-        case 'price-asc':
-          dbQuery = dbQuery.orderBy(asc(cupcakes.price));
-          break;
-        case 'price-desc':
-          dbQuery = dbQuery.orderBy(desc(cupcakes.price));
-          break;
-        case 'newest':
-          dbQuery = dbQuery.orderBy(desc(cupcakes.createdAt));
-          break;
-        default:
-          dbQuery = dbQuery.orderBy(asc(cupcakes.name));
-      }
-    } else {
-      dbQuery = dbQuery.orderBy(asc(cupcakes.name));
+    // Determine sort order
+    let orderByClause;
+    switch (options?.sort) {
+      case 'name':
+        orderByClause = asc(cupcakes.name);
+        break;
+      case 'price-asc':
+        orderByClause = asc(cupcakes.price);
+        break;
+      case 'price-desc':
+        orderByClause = desc(cupcakes.price);
+        break;
+      case 'newest':
+        orderByClause = desc(cupcakes.createdAt);
+        break;
+      default:
+        orderByClause = asc(cupcakes.name);
     }
 
-    // Apply pagination
-    if (options?.limit) {
-      dbQuery = dbQuery.limit(options.limit);
-    }
-    if (options?.offset) {
-      dbQuery = dbQuery.offset(options.offset);
-    }
+    // Build query with sorting and pagination in one chain
+    const dbQuery = baseQuery
+      .orderBy(orderByClause)
+      .limit(options?.limit ?? Number.MAX_SAFE_INTEGER)
+      .offset(options?.offset ?? 0);
 
     return dbQuery;
   }

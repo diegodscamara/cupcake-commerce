@@ -40,7 +40,7 @@ export default function SupportPage() {
       setEmail('');
       setSubject('');
       setMessage('');
-    } catch (err) {
+    } catch {
       toast({
         title: 'Erro ao enviar mensagem',
         description: 'Ocorreu um erro ao enviar sua mensagem. Tente novamente.',

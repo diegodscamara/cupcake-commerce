@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { getCurrentUser } from '@/lib/auth/server';
 import { OrderController } from '@/controllers/order.controller';
 import { OrderModel } from '@/models/order.model';
 import { AddressModel } from '@/models/address.model';
@@ -14,10 +14,7 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 
 async function getOrder(orderId: string) {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   if (!user) {
     return null;

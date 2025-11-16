@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { getCurrentUser } from '@/lib/auth/server';
 import { OrderController } from '@/controllers/order.controller';
 import { notFound } from 'next/navigation';
 import Link from 'next/link';
@@ -29,10 +29,7 @@ export default async function OrderTrackPage({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   if (!user) {
     notFound();

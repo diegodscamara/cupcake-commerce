@@ -35,7 +35,9 @@ describe('ReviewModel', () => {
 
       const mockSelect = {
         from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockResolvedValue(mockReviews),
+        innerJoin: vi.fn().mockReturnThis(),
+        where: vi.fn().mockReturnThis(),
+        orderBy: vi.fn().mockResolvedValue(mockReviews),
       };
 
       vi.mocked(db.select).mockReturnValue(mockSelect as any);

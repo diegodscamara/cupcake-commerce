@@ -1,8 +1,7 @@
 import { ProductController } from '@/controllers/product.controller';
 import { ReviewModel } from '@/models/review.model';
-import { createClient } from '@/lib/supabase/server';
+import { getCurrentUser } from '@/lib/auth/server';
 import { notFound } from 'next/navigation';
-import Image from 'next/image';
 import Link from 'next/link';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
@@ -72,10 +71,7 @@ export default async function ProductDetailPage({
     notFound();
   }
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   const userReview = user
     ? await ReviewModel.findByUserAndCupcake(user.id, cupcake.id)
@@ -266,7 +262,7 @@ export default async function ProductDetailPage({
                   </div>
                   {userReview.comment && (
                     <p className="text-muted-foreground text-sm italic">
-                      "{userReview.comment}"
+                      &ldquo;{userReview.comment}&rdquo;
                     </p>
                   )}
                 </div>

@@ -10,17 +10,7 @@ import Image from 'next/image';
 import type { DeliveryMethod } from '@/lib/utils/shipping';
 import { calculateShipping } from '@/lib/utils/shipping';
 import type { Address } from '@/lib/db/schema';
-
-interface CartItem {
-  id: string;
-  quantity: number;
-  cupcake: {
-    id: string;
-    name: string;
-    price: string;
-    imageUrl: string | null;
-  };
-}
+import type { CartItem } from '@/lib/types/cart';
 
 export default function CheckoutPage() {
   const router = useRouter();

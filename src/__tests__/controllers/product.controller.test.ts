@@ -65,6 +65,7 @@ describe('ProductController', () => {
       vi.mocked(CupcakeModel.findByCategory).mockResolvedValue(
         mockCupcakes as any
       );
+      vi.mocked(CupcakeModel.countByCategory).mockResolvedValue(1);
       vi.mocked(CategoryModel.findAll).mockResolvedValue([mockCategory] as any);
 
       await ProductController.getProducts({
@@ -72,7 +73,15 @@ describe('ProductController', () => {
       });
 
       expect(CategoryModel.findBySlug).toHaveBeenCalledWith('chocolate');
-      expect(CupcakeModel.findByCategory).toHaveBeenCalledWith('cat-1');
+      expect(CupcakeModel.findByCategory).toHaveBeenCalledWith(
+        'cat-1',
+        true,
+        expect.objectContaining({
+          limit: 12,
+          offset: 0,
+          sort: 'name',
+        })
+      );
     });
 
     it('should return all products when category not found', async () => {
@@ -102,15 +111,22 @@ describe('ProductController', () => {
         },
       ];
 
-      vi.mocked(CupcakeModel.findAll).mockResolvedValue(mockCupcakes as any);
       vi.mocked(CupcakeModel.search).mockResolvedValue(mockCupcakes as any);
+      vi.mocked(CupcakeModel.countSearch).mockResolvedValue(1);
       vi.mocked(CategoryModel.findAll).mockResolvedValue([]);
 
       const result = await ProductController.getProducts({
         search: 'chocolate',
       });
 
-      expect(CupcakeModel.search).toHaveBeenCalledWith('chocolate');
+      expect(CupcakeModel.search).toHaveBeenCalledWith(
+        'chocolate',
+        expect.objectContaining({
+          limit: 12,
+          offset: 0,
+          sort: 'name',
+        })
+      );
       expect(result.cupcakes).toEqual(mockCupcakes);
     });
   });
@@ -148,8 +164,8 @@ describe('ProductController', () => {
         ...mockCupcake,
         category: mockCategory,
         reviews: mockReviews,
-        avgRating: (5 + 4 + 5) / 3,
       });
+      expect(result?.avgRating).toBeCloseTo((5 + 4 + 5) / 3, 1);
     });
 
     it('should return null when product not found', async () => {

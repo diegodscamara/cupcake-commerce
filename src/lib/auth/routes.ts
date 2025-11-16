@@ -10,6 +10,7 @@ export const publicRoutes = [
   '/',
   '/products',
   '/products/',
+  '/cart',
   '/support',
 ] as const;
 
@@ -22,12 +23,7 @@ export const authRoutes = ['/login', '/signup', '/forgot-password'] as const;
 /**
  * Protected routes - require authentication
  */
-export const protectedRoutes = [
-  '/cart',
-  '/checkout',
-  '/orders',
-  '/profile',
-] as const;
+export const protectedRoutes = ['/checkout', '/orders', '/profile'] as const;
 
 /**
  * API routes that require authentication

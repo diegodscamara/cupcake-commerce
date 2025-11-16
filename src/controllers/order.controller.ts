@@ -174,7 +174,7 @@ export class OrderController {
       try {
         await CartController.addToCart(userId, item.cupcake.id, quantityToAdd);
         addedCount++;
-      } catch (error) {
+      } catch {
         skippedCount++;
       }
     }

@@ -6,14 +6,14 @@ import { Button } from '@/components/ui/button';
 import { useToast } from '@/hooks/use-toast';
 import { ShoppingCart, Plus, Minus } from 'lucide-react';
 import { logger } from '@/lib/logger';
-import { createClient } from '@/lib/supabase/client';
+import type { CartItem } from '@/lib/types/cart';
 
 interface AddToCartButtonProps {
   cupcakeId: string;
   disabled?: boolean;
 }
 
-interface CartItem {
+interface CartItemState {
   id: string;
   quantity: number;
   cupcakeId: string;
@@ -24,28 +24,26 @@ export function AddToCartButton({ cupcakeId, disabled }: AddToCartButtonProps) {
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
   const [checking, setChecking] = useState(true);
-  const [cartItem, setCartItem] = useState<CartItem | null>(null);
+  const [cartItem, setCartItem] = useState<CartItemState | null>(null);
 
   useEffect(() => {
     const checkCartItem = async () => {
       try {
-        const supabase = createClient();
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
-
-        if (!user) {
-          setChecking(false);
-          return;
-        }
-
         const response = await fetch('/api/cart');
         if (response.ok) {
           const data = await response.json();
           const item = data.items.find(
             (item: CartItem) => item.cupcakeId === cupcakeId
           );
-          setCartItem(item || null);
+          if (item) {
+            setCartItem({
+              id: item.id,
+              quantity: item.quantity,
+              cupcakeId: item.cupcakeId,
+            });
+          } else {
+            setCartItem(null);
+          }
         }
       } catch (err) {
         logger.error('Error checking cart item', err);
@@ -72,15 +70,21 @@ export function AddToCartButton({ cupcakeId, disabled }: AddToCartButtonProps) {
       });
 
       if (response.ok) {
-        const data = await response.json();
-        // Refresh cart item after adding
         const cartResponse = await fetch('/api/cart');
         if (cartResponse.ok) {
           const cartData = await cartResponse.json();
           const item = cartData.items.find(
             (item: CartItem) => item.cupcakeId === cupcakeId
           );
-          setCartItem(item || null);
+          if (item) {
+            setCartItem({
+              id: item.id,
+              quantity: item.quantity,
+              cupcakeId: item.cupcakeId,
+            });
+          } else {
+            setCartItem(null);
+          }
         }
         toast({
           title: 'Adicionado ao carrinho',
@@ -116,13 +120,16 @@ export function AddToCartButton({ cupcakeId, disabled }: AddToCartButtonProps) {
 
     setLoading(true);
     try {
+      const isSessionCart = cartItem.id.startsWith('session_');
       const response = await fetch('/api/cart', {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          itemId: cartItem.id,
+          ...(isSessionCart
+            ? { cupcakeId: cartItem.cupcakeId }
+            : { itemId: cartItem.id }),
           quantity: newQuantity,
         }),
       });
@@ -150,7 +157,12 @@ export function AddToCartButton({ cupcakeId, disabled }: AddToCartButtonProps) {
 
     setLoading(true);
     try {
-      const response = await fetch(`/api/cart?itemId=${cartItem.id}`, {
+      const isSessionCart = cartItem.id.startsWith('session_');
+      const url = isSessionCart
+        ? `/api/cart?cupcakeId=${cartItem.cupcakeId}`
+        : `/api/cart?itemId=${cartItem.id}`;
+
+      const response = await fetch(url, {
         method: 'DELETE',
       });
 
@@ -199,7 +211,7 @@ export function AddToCartButton({ cupcakeId, disabled }: AddToCartButtonProps) {
         >
           <Minus className="h-4 w-4" />
         </Button>
-        <span className="min-w-[2rem] text-center font-semibold">
+        <span className="min-w-8 text-center font-semibold">
           {cartItem.quantity}
         </span>
         <Button

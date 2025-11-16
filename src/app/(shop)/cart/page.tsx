@@ -1,5 +1,6 @@
-import { createClient } from '@/lib/supabase/server';
 import { CartController } from '@/controllers/cart.controller';
+import { getSessionCartWithDetails } from '@/lib/utils/cart-session';
+import { getCurrentUser } from '@/lib/auth/server';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Button } from '@/components/ui/button';
@@ -23,16 +24,13 @@ import {
 } from 'lucide-react';
 
 async function getCartItems() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
-  if (!user) {
-    return [];
+  if (user) {
+    return CartController.getCartItems(user.id);
+  } else {
+    return getSessionCartWithDetails();
   }
-
-  return CartController.getCartItems(user.id);
 }
 
 export default async function CartPage() {
@@ -111,12 +109,16 @@ export default async function CartPage() {
                           </p>
                         )}
                       </div>
-                      <CartItemDelete itemId={item.id} />
+                      <CartItemDelete
+                        itemId={item.id}
+                        cupcakeId={item.cupcakeId}
+                      />
                     </div>
 
                     <div className="mt-4 flex items-center justify-between">
                       <CartItemQuantity
                         itemId={item.id}
+                        cupcakeId={item.cupcakeId}
                         quantity={item.quantity}
                         maxQuantity={item.cupcake.stock}
                       />

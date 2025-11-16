@@ -9,12 +9,14 @@ import { logger } from '@/lib/logger';
 
 interface CartItemQuantityProps {
   itemId: string;
+  cupcakeId?: string;
   quantity: number;
   maxQuantity?: number;
 }
 
 export function CartItemQuantity({
   itemId,
+  cupcakeId,
   quantity,
   maxQuantity,
 }: CartItemQuantityProps) {
@@ -38,13 +40,14 @@ export function CartItemQuantity({
 
     setLoading(true);
     try {
+      const isSessionCart = itemId.startsWith('session_');
       const response = await fetch('/api/cart', {
         method: 'PATCH',
         headers: {
           'Content-Type': 'application/json',
         },
         body: JSON.stringify({
-          itemId,
+          ...(isSessionCart && cupcakeId ? { cupcakeId } : { itemId }),
           quantity: newQuantity,
         }),
       });

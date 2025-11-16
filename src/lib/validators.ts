@@ -20,10 +20,15 @@ export const addToCartSchema = z.object({
   quantity: z.number().int().min(1).max(100).default(1),
 });
 
-export const updateCartItemSchema = z.object({
-  itemId: uuidSchema,
-  quantity: z.number().int().min(1).max(100),
-});
+export const updateCartItemSchema = z
+  .object({
+    itemId: uuidSchema.optional(),
+    cupcakeId: uuidSchema.optional(),
+    quantity: z.number().int().min(1).max(100),
+  })
+  .refine((data) => data.itemId || data.cupcakeId, {
+    message: 'Either itemId or cupcakeId must be provided',
+  });
 
 // Order schemas
 export const createOrderSchema = z.object({

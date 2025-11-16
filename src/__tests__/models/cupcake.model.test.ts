@@ -30,7 +30,10 @@ describe('CupcakeModel', () => {
 
       const mockSelect = {
         from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockResolvedValue(mockCupcakes),
+        where: vi.fn().mockReturnThis(),
+        orderBy: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockReturnThis(),
+        offset: vi.fn().mockResolvedValue(mockCupcakes),
       };
 
       vi.mocked(db.select).mockReturnValue(mockSelect as any);
@@ -95,7 +98,10 @@ describe('CupcakeModel', () => {
 
       const mockSelect = {
         from: vi.fn().mockReturnThis(),
-        where: vi.fn().mockResolvedValue(mockCupcakes),
+        where: vi.fn().mockReturnThis(),
+        orderBy: vi.fn().mockReturnThis(),
+        limit: vi.fn().mockReturnThis(),
+        offset: vi.fn().mockResolvedValue(mockCupcakes),
       };
 
       vi.mocked(db.select).mockReturnValue(mockSelect as any);

@@ -1,14 +1,11 @@
-import { createClient } from '@/lib/supabase/server';
+import { getCurrentUser } from '@/lib/auth/server';
 import { OrderController } from '@/controllers/order.controller';
 import { OrdersTable } from '@/components/orders/orders-table';
 import { EmptyOrders } from '@/components/ui/empty-state';
 import { redirect } from 'next/navigation';
 
 async function getOrders() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   if (!user) {
     redirect('/login?redirect=/orders');

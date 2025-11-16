@@ -1,4 +1,4 @@
-import { createClient } from '@/lib/supabase/server';
+import { getCurrentUser } from '@/lib/auth/server';
 import { FavoriteController } from '@/controllers/favorite.controller';
 import { redirect } from 'next/navigation';
 import Image from 'next/image';
@@ -9,10 +9,7 @@ import { FavoriteButton } from '@/components/product/favorite-button';
 import { EmptyFavorites } from '@/components/ui/empty-state';
 
 export default async function FavoritesPage() {
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   if (!user) {
     redirect('/login');

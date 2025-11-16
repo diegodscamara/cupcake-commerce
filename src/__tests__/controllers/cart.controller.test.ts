@@ -104,6 +104,16 @@ describe('CartController', () => {
 
   describe('updateQuantity', () => {
     it('should update item quantity', async () => {
+      vi.mocked(CartModel.findById).mockResolvedValue({
+        id: 'cart-item-1',
+        quantity: 2,
+        cupcakeId: 'cupcake-1',
+        cupcake: { id: 'cupcake-1', stock: 10 },
+      } as any);
+      vi.mocked(CupcakeModel.findById).mockResolvedValue({
+        id: 'cupcake-1',
+        stock: 10,
+      } as any);
       vi.mocked(CartModel.updateQuantity).mockResolvedValue({
         id: 'cart-item-1',
         quantity: 5,
@@ -111,6 +121,8 @@ describe('CartController', () => {
 
       const result = await CartController.updateQuantity('cart-item-1', 5);
 
+      expect(CartModel.findById).toHaveBeenCalledWith('cart-item-1');
+      expect(CupcakeModel.findById).toHaveBeenCalledWith('cupcake-1');
       expect(CartModel.updateQuantity).toHaveBeenCalledWith('cart-item-1', 5);
       expect(result.quantity).toBe(5);
     });

@@ -1,23 +1,10 @@
 import { ProductController } from '@/controllers/product.controller';
-import Link from 'next/link';
-import Image from 'next/image';
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
-import { AddToCartButton } from '@/components/cart/add-to-cart-button';
 import { SearchFilterWrapper } from '@/components/products/search-filter-wrapper';
 import { ProductSort } from '@/components/products/product-sort';
 import { ProductPagination } from '@/components/products/product-pagination';
-import { FavoriteButton } from '@/components/product/favorite-button';
+import { ProductCard } from '@/components/products/product-card';
 import { EmptySearch } from '@/components/ui/empty-state';
-import { createClient } from '@/lib/supabase/server';
+import { getCurrentUser } from '@/lib/auth/server';
 import type { SortOption } from '@/models/cupcake.model';
 
 export default async function ProductsPage({
@@ -46,10 +33,7 @@ export default async function ProductsPage({
     sort,
   });
 
-  const supabase = await createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await getCurrentUser();
 
   return (
     <div className="container mx-auto max-w-7xl px-4 py-8">
@@ -77,59 +61,17 @@ export default async function ProductsPage({
         <>
           <div className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
             {cupcakesList.map((cupcake) => (
-              <article key={cupcake.id} data-testid="product-card">
-                <Card className="group relative flex h-full flex-col overflow-hidden py-0 transition-shadow hover:shadow-lg">
-                  <Link href={`/products/${cupcake.slug}`} className="block">
-                    <div className="bg-muted relative aspect-square w-full overflow-hidden">
-                      {cupcake.imageUrl ? (
-                        <Image
-                          src={cupcake.imageUrl}
-                          alt={cupcake.name}
-                          fill
-                          className="object-cover transition-transform group-hover:scale-105"
-                          sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-                        />
-                      ) : (
-                        <div className="flex h-full items-center justify-center text-4xl">
-                          🧁
-                        </div>
-                      )}
-                      {user && (
-                        <div className="absolute top-2 right-2">
-                          <FavoriteButton cupcakeId={cupcake.id} />
-                        </div>
-                      )}
-                    </div>
-                  </Link>
-                  <CardContent className="flex flex-1 flex-col p-4">
-                    <Link href={`/products/${cupcake.slug}`}>
-                      <CardTitle className="mb-2 line-clamp-2">
-                        {cupcake.name}
-                      </CardTitle>
-                      <CardDescription className="mb-4 line-clamp-2 text-sm">
-                        {cupcake.description}
-                      </CardDescription>
-                    </Link>
-                    <div className="mt-auto space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xl font-bold">
-                          R${' '}
-                          {Number(cupcake.price).toFixed(2).replace('.', ',')}
-                        </span>
-                        {cupcake.stock > 0 ? (
-                          <Badge variant="default">Em estoque</Badge>
-                        ) : (
-                          <Badge variant="secondary">Esgotado</Badge>
-                        )}
-                      </div>
-                      <AddToCartButton
-                        cupcakeId={cupcake.id}
-                        disabled={cupcake.stock === 0}
-                      />
-                    </div>
-                  </CardContent>
-                </Card>
-              </article>
+              <ProductCard
+                key={cupcake.id}
+                id={cupcake.id}
+                slug={cupcake.slug}
+                name={cupcake.name}
+                description={cupcake.description}
+                price={cupcake.price}
+                imageUrl={cupcake.imageUrl}
+                stock={cupcake.stock}
+                userId={user?.id}
+              />
             ))}
           </div>
 

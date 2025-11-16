@@ -20,7 +20,7 @@ interface ProductShareProps {
 export function ProductShare({
   productName,
   productSlug,
-  productImage,
+  productImage: _productImage,
 }: ProductShareProps) {
   const { toast } = useToast();
   const [copied, setCopied] = useState(false);
@@ -43,7 +43,7 @@ export function ProductShare({
         variant: 'success',
       });
       setTimeout(() => setCopied(false), 2000);
-    } catch (error) {
+    } catch {
       toast({
         title: 'Erro ao copiar',
         description: 'Não foi possível copiar o link.',

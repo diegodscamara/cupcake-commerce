@@ -9,6 +9,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "typecheck": "tsc --noEmit",
+    "check": "pnpm format && pnpm lint && pnpm typecheck && pnpm test && pnpm build",
     "db:generate": "drizzle-kit generate",
     "db:push": "drizzle-kit push",
     "db:studio": "drizzle-kit studio",

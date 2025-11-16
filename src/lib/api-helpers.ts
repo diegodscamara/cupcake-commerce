@@ -87,6 +87,47 @@ export async function requireAuth(
 }
 
 /**
+ * Get optional authentication for API routes that support anonymous users
+ * Returns user if authenticated, null otherwise
+ */
+export async function getOptionalAuth(): Promise<{
+  id: string;
+  email?: string;
+} | null> {
+  const { createClient } = await import('@/lib/supabase/server');
+  const supabase = await createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+
+  if (!user) {
+    return null;
+  }
+
+  return { id: user.id, email: user.email };
+}
+
+/**
+ * Parse and validate query parameters with Zod schema
+ */
+export async function parseQueryParams<T>(
+  request: NextRequest,
+  schema: { parse: (data: unknown) => T }
+): Promise<T> {
+  const { searchParams } = new URL(request.url);
+  const params = Object.fromEntries(searchParams.entries());
+
+  try {
+    return schema.parse(params);
+  } catch (error) {
+    if (error instanceof ZodError) {
+      throw error;
+    }
+    throw new ValidationError('Invalid query parameters');
+  }
+}
+
+/**
  * Parse and validate request body with Zod schema
  */
 export async function parseBody<T>(

@@ -4,6 +4,7 @@ import * as React from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Card, CardContent } from '@/components/ui/card';
+import { Badge } from '@/components/ui/badge';
 import {
   Carousel,
   CarouselContent,
@@ -19,6 +20,7 @@ interface HeroCarouselProps {
     name: string;
     price: string;
     imageUrl: string | null;
+    stock?: number;
   }>;
 }
 
@@ -61,9 +63,24 @@ export function HeroCarousel({ products }: HeroCarouselProps) {
                   </div>
                   <CardContent className="p-4">
                     <h3 className="mb-1 font-semibold">{cupcake.name}</h3>
-                    <p className="text-muted-foreground text-sm">
-                      R$ {Number(cupcake.price).toFixed(2).replace('.', ',')}
-                    </p>
+                    <div className="flex items-center justify-between">
+                      <p className="text-muted-foreground text-sm">
+                        R$ {Number(cupcake.price).toFixed(2).replace('.', ',')}
+                      </p>
+                      {cupcake.stock !== undefined && (
+                        <>
+                          {cupcake.stock > 0 ? (
+                            <Badge variant="default" className="text-xs">
+                              Em estoque
+                            </Badge>
+                          ) : (
+                            <Badge variant="secondary" className="text-xs">
+                              Esgotado
+                            </Badge>
+                          )}
+                        </>
+                      )}
+                    </div>
                   </CardContent>
                 </Card>
               </Link>

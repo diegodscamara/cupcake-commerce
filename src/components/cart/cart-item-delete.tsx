@@ -10,10 +10,15 @@ import { cn } from '@/lib/utils';
 
 interface CartItemDeleteProps {
   itemId: string;
+  cupcakeId?: string;
   className?: string;
 }
 
-export function CartItemDelete({ itemId, className }: CartItemDeleteProps) {
+export function CartItemDelete({
+  itemId,
+  cupcakeId,
+  className,
+}: CartItemDeleteProps) {
   const router = useRouter();
   const { toast } = useToast();
   const [loading, setLoading] = useState(false);
@@ -21,7 +26,12 @@ export function CartItemDelete({ itemId, className }: CartItemDeleteProps) {
   const removeItem = async () => {
     setLoading(true);
     try {
-      const response = await fetch(`/api/cart?itemId=${itemId}`, {
+      const isSessionCart = itemId.startsWith('session_');
+      const url = isSessionCart
+        ? `/api/cart?cupcakeId=${cupcakeId}`
+        : `/api/cart?itemId=${itemId}`;
+
+      const response = await fetch(url, {
         method: 'DELETE',
       });
 
