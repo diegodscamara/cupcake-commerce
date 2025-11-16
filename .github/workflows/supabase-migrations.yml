@@ -1,0 +1,88 @@
+name: Deploy Supabase Migrations
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'drizzle/**'
+      - 'src/lib/db/schema/**'
+      - 'supabase/migrations/**'
+      - '.github/workflows/supabase-migrations.yml'
+  workflow_dispatch:
+
+jobs:
+  deploy-migrations:
+    name: Deploy migrations to Supabase
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 10
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'pnpm'
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Setup Supabase CLI
+        uses: supabase/setup-cli@v1
+        with:
+          version: latest
+
+      - name: Link Supabase project
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
+        run: |
+          supabase link --project-ref $SUPABASE_PROJECT_REF
+
+      - name: Pull remote migrations
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          # Pull remote migrations to sync with local state
+          # This ensures we have the latest migrations from Supabase in supabase/migrations/
+          supabase db pull --schema public || echo "No remote migrations to pull or already synced"
+
+      - name: Sync Drizzle migrations to Supabase format
+        run: |
+          # Ensure supabase/migrations directory exists
+          mkdir -p supabase/migrations
+          
+          # Copy any new Drizzle migrations to Supabase migrations directory
+          # Supabase CLI expects migrations in supabase/migrations/ with timestamp prefix
+          if [ -d "drizzle" ] && [ "$(ls -A drizzle/*.sql 2>/dev/null)" ]; then
+            echo "Syncing Drizzle migrations to Supabase format..."
+            for file in drizzle/*.sql; do
+              if [ -f "$file" ]; then
+                filename=$(basename "$file")
+                # Only copy if it doesn't already exist in supabase/migrations
+                if [ ! -f "supabase/migrations/$filename" ]; then
+                  echo "Copying $filename to supabase/migrations/"
+                  cp "$file" "supabase/migrations/$filename"
+                else
+                  echo "Migration $filename already exists in supabase/migrations/"
+                fi
+              fi
+            done
+          else
+            echo "No Drizzle migrations found"
+          fi
+
+      - name: Push migrations to remote
+        env:
+          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
+        run: |
+          # Push migrations to Supabase remote
+          # This applies migrations from supabase/migrations/ to the remote database
+          supabase db push

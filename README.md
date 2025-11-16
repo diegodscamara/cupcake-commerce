@@ -73,17 +73,18 @@ SUPABASE_SERVICE_ROLE_KEY=your_service_role_key
 DATABASE_URL=postgresql://user:password@host:port/database
 ```
 
-3. Aplique o schema ao banco de dados:
+3. Aplique o schema ao banco de dados (desenvolvimento local):
 
 ```bash
+# Para desenvolvimento local, use drizzle-kit push
 pnpm db:push
+
+# Ou gere migrações e aplique localmente
+pnpm db:generate  # Gera arquivos de migração em drizzle/
+pnpm db:migrate   # Aplica migrações ao banco local
 ```
 
-**Nota:** Este projeto usa o workflow **schema → push** do Drizzle. Para alterar o banco de dados:
-
-- Edite os arquivos de schema em `src/lib/db/schema/`
-- Execute `pnpm db:push` para aplicar as mudanças diretamente ao banco
-- Não é necessário gerar migrações manualmente - o Drizzle sincroniza o schema automaticamente
+**Nota:** Para produção, as migrações são aplicadas automaticamente via GitHub Actions quando você faz push para `main`.
 
 4. Popule o banco com dados iniciais:
 
@@ -108,7 +109,9 @@ pnpm dev
 - `pnpm test` - Executa testes unitários
 - `pnpm test:ui` - Abre interface visual de testes
 - `pnpm test:coverage` - Gera relatório de cobertura
-- `pnpm db:push` - Aplica schema ao banco (workflow padrão: edite schemas → push)
+- `pnpm db:generate` - Gera migrações a partir do schema (apenas desenvolvimento local)
+- `pnpm db:migrate` - Aplica migrações ao banco (apenas desenvolvimento local)
+- `pnpm db:push` - Aplica schema diretamente ao banco (apenas desenvolvimento local)
 - `pnpm db:studio` - Abre Drizzle Studio para visualizar o banco
 - `pnpm db:seed` - Popula banco com dados iniciais
 
@@ -128,34 +131,67 @@ pnpm dev
 
 ## Workflow do Banco de Dados
 
-Este projeto usa o workflow **schema → push** do Drizzle ORM. O histórico de mudanças é mantido no Git através dos arquivos de schema.
+Este projeto usa **Drizzle ORM** com migrações versionadas. O workflow difere entre desenvolvimento local e produção.
 
-### Workflow Padrão
+### Desenvolvimento Local
 
-1. **Edite os arquivos de schema** em `src/lib/db/schema/`
-2. **Execute `pnpm db:push`** para aplicar as mudanças ao banco
-3. **Commit as mudanças** dos arquivos de schema no Git
+Para desenvolvimento local, você pode usar qualquer um dos métodos:
 
-### Exemplo
+**Opção 1: Push direto (rápido para prototipagem)**
 
 ```bash
-# 1. Edite o schema (ex: src/lib/db/schema/users.ts)
-# 2. Aplique ao banco
+# 1. Edite os arquivos de schema em src/lib/db/schema/
+# 2. Aplique diretamente ao banco local
 pnpm db:push
-
-# 3. Commit no Git
-git add src/lib/db/schema/
-git commit -m "feat: add new field to users table"
 ```
 
-### Por que não usar migrações?
+**Opção 2: Migrações (recomendado para mudanças complexas)**
 
-- **Simplicidade**: Menos arquivos para gerenciar
-- **Git como histórico**: Mudanças de schema são versionadas no Git
-- **Rápido**: Aplicação direta sem gerar arquivos intermediários
-- **Adequado para equipes pequenas**: Funciona bem para projetos com poucos desenvolvedores
+```bash
+# 1. Edite os arquivos de schema em src/lib/db/schema/
+# 2. Gere arquivos de migração
+pnpm db:generate
 
-**Nota:** O script `db:generate` existe no package.json mas não é usado no workflow padrão. Use apenas `db:push`.
+# 3. Revise os arquivos gerados em drizzle/
+# 4. Aplique as migrações
+pnpm db:migrate
+```
+
+### Produção (Supabase Remote)
+
+As migrações para produção são aplicadas automaticamente via **GitHub Actions** quando você faz push para `main`:
+
+1. **Edite os arquivos de schema** em `src/lib/db/schema/`
+2. **Gere migrações localmente** (opcional, para revisar):
+   ```bash
+   pnpm db:generate
+   ```
+3. **Commit e push** para `main`:
+   ```bash
+   git add src/lib/db/schema/ drizzle/
+   git commit -m "feat: add new field to users table"
+   git push origin main
+   ```
+4. **GitHub Actions** automaticamente:
+   - Linka ao projeto Supabase
+   - Sincroniza migrações remotas (`supabase db pull`)
+   - Aplica migrações ao Supabase (`supabase db push`)
+
+### Configuração do GitHub Actions
+
+Para que as migrações automáticas funcionem, configure os seguintes secrets no GitHub:
+
+1. `SUPABASE_ACCESS_TOKEN` - Token de acesso do Supabase
+   - Obtenha em: https://supabase.com/dashboard/account/tokens
+2. `SUPABASE_PROJECT_REF` - Referência do projeto Supabase
+   - Encontre em: https://supabase.com/dashboard/project/_/settings/general
+   - Formato: `xxxxxxxxxxxxxx`
+
+### Estrutura de Migrações
+
+- **Schema**: `src/lib/db/schema/` - Definições TypeScript do schema
+- **Migrações**: `drizzle/` - Arquivos SQL de migração gerados
+- **Config**: `drizzle.config.ts` - Configuração do Drizzle Kit
 
 ## Estrutura de Pastas
 
