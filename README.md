@@ -76,11 +76,10 @@ DATABASE_URL=postgresql://user:password@host:port/database
 3. Aplique o schema ao banco de dados (desenvolvimento local):
 
 ```bash
-# Para desenvolvimento local, use drizzle-kit push
-pnpm db:push
-
-# Ou gere migrações e aplique localmente
+# Gere migrações a partir do schema
 pnpm db:generate  # Gera arquivos de migração em drizzle/
+
+# Aplique as migrações ao banco local
 pnpm db:migrate   # Aplica migrações ao banco local
 ```
 
@@ -111,7 +110,6 @@ pnpm dev
 - `pnpm test:coverage` - Gera relatório de cobertura
 - `pnpm db:generate` - Gera migrações a partir do schema (apenas desenvolvimento local)
 - `pnpm db:migrate` - Aplica migrações ao banco (apenas desenvolvimento local)
-- `pnpm db:push` - Aplica schema diretamente ao banco (apenas desenvolvimento local)
 - `pnpm db:studio` - Abre Drizzle Studio para visualizar o banco
 - `pnpm db:seed` - Popula banco com dados iniciais
 

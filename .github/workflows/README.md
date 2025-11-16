@@ -17,8 +17,9 @@ O workflow `supabase-migrations.yml` gerencia o deploy automático de migraçõe
 1. **Instala dependências** (pnpm)
 2. **Configura Supabase CLI**
 3. **Linka ao projeto** usando `SUPABASE_PROJECT_REF`
-4. **Sincroniza migrações remotas** (`supabase db pull`)
-5. **Aplica migrações** (`supabase db push`)
+4. **Sincroniza migrações remotas** (`supabase db pull`) - baixa migrações do Supabase para `supabase/migrations/`
+5. **Sincroniza migrações Drizzle** - copia migrações de `drizzle/` para `supabase/migrations/` se necessário
+6. **Aplica migrações** (`supabase db push`) - envia migrações de `supabase/migrations/` para o Supabase remoto
 
 ### Secrets necessários
 
