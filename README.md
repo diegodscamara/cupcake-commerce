@@ -133,17 +133,7 @@ Este projeto usa **Drizzle ORM** com migrações versionadas. O workflow difere 
 
 ### Desenvolvimento Local
 
-Para desenvolvimento local, você pode usar qualquer um dos métodos:
-
-**Opção 1: Push direto (rápido para prototipagem)**
-
-```bash
-# 1. Edite os arquivos de schema em src/lib/db/schema/
-# 2. Aplique diretamente ao banco local
-pnpm db:push
-```
-
-**Opção 2: Migrações (recomendado para mudanças complexas)**
+Para desenvolvimento local, use o workflow de migrações:
 
 ```bash
 # 1. Edite os arquivos de schema em src/lib/db/schema/
@@ -151,7 +141,7 @@ pnpm db:push
 pnpm db:generate
 
 # 3. Revise os arquivos gerados em drizzle/
-# 4. Aplique as migrações
+# 4. Aplique as migrações ao banco local
 pnpm db:migrate
 ```
 
