@@ -88,11 +88,15 @@ O workflow `supabase-seed.yml` gerencia o seeding (população) do banco de dado
 
 ### Secrets necessários
 
-Além dos secrets do workflow de migrações, você precisa de:
+Você precisa de apenas um secret:
 
-- `SUPABASE_DB_PASSWORD`: Senha do banco de dados Supabase
-  - Obtenha em: https://supabase.com/dashboard/project/_/settings/database
-  - Vá em **Database** → **Connection string** → **URI** ou **Settings** → **Database** → **Database password**
+- `DATABASE_URL`: Connection string completa do banco de dados remoto
+  - **Como obter:**
+    1. Acesse https://supabase.com/dashboard/project/_/settings/database
+    2. Vá em **Connection string** → **URI**
+    3. Copie a connection string completa (formato: `postgresql://postgres:[PASSWORD]@db.[PROJECT_REF].supabase.co:5432/postgres`)
+    4. Adicione como secret `DATABASE_URL` no GitHub
+  - **Dica:** Use a mesma `DATABASE_URL` do seu `.env.local` mas com a senha do banco remoto
 
 ### Como executar manualmente?
 

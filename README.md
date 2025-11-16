@@ -196,8 +196,10 @@ Para popular o banco de dados remoto com dados iniciais (produtos, categorias, e
 4. Execute o workflow
 
 **Secrets necessários:**
-- `SUPABASE_DB_PASSWORD`: Senha do banco de dados
-  - Obtenha em: Dashboard → Settings → Database → Database password
+- `DATABASE_URL`: Connection string completa do banco remoto
+  - Obtenha em: Dashboard → Settings → Database → Connection string → URI
+  - Copie a connection string completa e adicione como secret `DATABASE_URL` no GitHub
+  - **Dica:** Use a mesma `DATABASE_URL` do seu `.env.local` mas com a senha do banco remoto
 
 **Local (desenvolvimento):**
 ```bash

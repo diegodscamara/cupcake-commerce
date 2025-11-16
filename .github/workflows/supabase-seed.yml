@@ -38,46 +38,19 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Setup Supabase CLI
-        uses: supabase/setup-cli@v1
-        with:
-          version: latest
-
-      - name: Link Supabase project
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
-        run: |
-          supabase link --project-ref $SUPABASE_PROJECT_REF
-
-      - name: Get database connection string
-        id: db-url
-        env:
-          SUPABASE_ACCESS_TOKEN: ${{ secrets.SUPABASE_ACCESS_TOKEN }}
-          SUPABASE_PROJECT_REF: ${{ secrets.SUPABASE_PROJECT_REF }}
-          SUPABASE_DB_PASSWORD: ${{ secrets.SUPABASE_DB_PASSWORD }}
-        run: |
-          # Construct database connection string
-          # Format: postgresql://postgres:[PASSWORD]@db.[PROJECT_REF].supabase.co:5432/postgres
-          if [ -z "$SUPABASE_DB_PASSWORD" ]; then
-            echo "❌ SUPABASE_DB_PASSWORD secret is required"
-            echo "Get your database password from: https://supabase.com/dashboard/project/$SUPABASE_PROJECT_REF/settings/database"
-            exit 1
-          fi
-          
-          # URL encode the password to handle special characters
-          ENCODED_PASSWORD=$(printf '%s' "$SUPABASE_DB_PASSWORD" | jq -sRr @uri)
-          DB_URL="postgresql://postgres:${ENCODED_PASSWORD}@db.${SUPABASE_PROJECT_REF}.supabase.co:5432/postgres"
-          
-          echo "DATABASE_URL=$DB_URL" >> $GITHUB_ENV
-          echo "✅ Database connection string configured"
-
       - name: Seed database
         env:
-          DATABASE_URL: ${{ env.DATABASE_URL }}
+          DATABASE_URL: ${{ secrets.DATABASE_URL }}
           CLEAR_EXISTING: ${{ github.event.inputs.clear_existing || 'false' }}
           NODE_ENV: production
         run: |
+          if [ -z "$DATABASE_URL" ]; then
+            echo "❌ DATABASE_URL secret is required"
+            echo "Add your remote database connection string as DATABASE_URL secret in GitHub"
+            echo "Get it from: Supabase Dashboard → Settings → Database → Connection string → URI"
+            exit 1
+          fi
+          
           echo "🌱 Starting database seeding..."
           echo "CLEAR_EXISTING=$CLEAR_EXISTING"
           if [ "$CLEAR_EXISTING" = "true" ]; then
