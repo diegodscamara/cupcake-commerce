@@ -58,7 +58,7 @@ jobs:
         run: |
           # Ensure supabase/migrations directory exists
           mkdir -p supabase/migrations
-          
+
           # Copy any new Drizzle migrations to Supabase migrations directory
           # Supabase CLI expects migrations in supabase/migrations/ with timestamp prefix
           if [ -d "drizzle" ] && [ "$(ls -A drizzle/*.sql 2>/dev/null)" ]; then

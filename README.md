@@ -176,7 +176,6 @@ Para que as migrações automáticas funcionem, configure os seguintes secrets n
 1. `SUPABASE_ACCESS_TOKEN` - Token de acesso do Supabase
    - Obtenha em: https://supabase.com/dashboard/account/tokens
    - Crie um novo token se necessário
-   
 2. `SUPABASE_PROJECT_REF` - Reference ID (ID de Referência) do projeto Supabase
    - **O que é:** Identificador único do projeto (não é o Project ID)
    - **Onde encontrar:**
@@ -190,17 +189,20 @@ Para que as migrações automáticas funcionem, configure os seguintes secrets n
 Para popular o banco de dados remoto com dados iniciais (produtos, categorias, etc.):
 
 **Método Simples (Recomendado):**
+
 ```bash
 # Gera arquivo SQL com dados de seed
 pnpm db:seed:sql
 ```
 
 Isso cria o arquivo `drizzle/seed.sql`. Depois:
+
 1. Abra o **Supabase Dashboard** → **SQL Editor**
 2. Copie o conteúdo de `drizzle/seed.sql`
 3. Cole e execute no SQL Editor
 
 **Local (desenvolvimento):**
+
 ```bash
 # Limpa dados existentes e adiciona novos
 pnpm db:seed
