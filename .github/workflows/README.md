@@ -56,3 +56,62 @@ O `SUPABASE_PROJECT_REF` é o **Reference ID** (ID de Referência) único do seu
 3. Copie o Reference ID e adicione como secret no GitHub
 
 **Exemplo:** Se sua URL é `https://supabase.com/dashboard/project/abcdefghijklmnop`, então `abcdefghijklmnop` é o seu `SUPABASE_PROJECT_REF`
+
+---
+
+## Supabase Database Seeding
+
+O workflow `supabase-seed.yml` gerencia o seeding (população) do banco de dados remoto com dados iniciais.
+
+### Quando é executado?
+
+- **Manualmente** via `workflow_dispatch` (recomendado)
+- Automaticamente quando há push para `main` com mudanças em `drizzle/seed.ts`
+
+### O que faz?
+
+1. **Instala dependências** (pnpm)
+2. **Configura Supabase CLI**
+3. **Linka ao projeto** usando `SUPABASE_PROJECT_REF`
+4. **Obtém connection string** do banco remoto
+5. **Executa seed script** para popular o banco com dados iniciais
+
+### Opções de seeding
+
+- **Sem limpar dados existentes** (padrão, seguro para produção):
+  - Adiciona dados sem deletar dados existentes
+  - Útil para adicionar novos produtos/categorias sem perder dados de usuários/pedidos
+
+- **Com limpeza de dados** (use com cuidado):
+  - Deleta todos os dados existentes antes de adicionar novos
+  - Útil apenas para ambientes de desenvolvimento/staging
+
+### Secrets necessários
+
+Além dos secrets do workflow de migrações, você precisa de:
+
+- `SUPABASE_DB_PASSWORD`: Senha do banco de dados Supabase
+  - Obtenha em: https://supabase.com/dashboard/project/_/settings/database
+  - Vá em **Database** → **Connection string** → **URI** ou **Settings** → **Database** → **Database password**
+
+### Como executar manualmente?
+
+1. Acesse **Actions** no GitHub
+2. Selecione **Seed Supabase Database**
+3. Clique em **Run workflow**
+4. Escolha se deseja limpar dados existentes (não recomendado para produção)
+5. Clique em **Run workflow**
+
+### Seeding local vs remoto
+
+**Local (desenvolvimento):**
+```bash
+# Usa DATABASE_URL do .env.local
+# Limpa dados existentes por padrão
+pnpm db:seed
+```
+
+**Remoto (produção):**
+- Execute via GitHub Actions workflow
+- Por padrão, **não limpa** dados existentes (seguro)
+- Use `CLEAR_EXISTING=true` apenas se necessário

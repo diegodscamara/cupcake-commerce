@@ -88,7 +88,11 @@ pnpm db:migrate   # Aplica migrações ao banco local
 4. Popule o banco com dados iniciais:
 
 ```bash
+# Para desenvolvimento local (limpa dados existentes)
 pnpm db:seed
+
+# Para produção remota, use o GitHub Actions workflow:
+# Actions → Seed Supabase Database → Run workflow
 ```
 
 5. Inicie o servidor de desenvolvimento:
@@ -181,10 +185,34 @@ Para que as migrações automáticas funcionem, configure os seguintes secrets n
    - **Formato:** Código alfanumérico (ex: `abcdefghijklmnop`)
    - **Exemplo:** Se sua URL é `https://supabase.com/dashboard/project/abc123xyz`, então `abc123xyz` é o seu `SUPABASE_PROJECT_REF`
 
+### Seeding do Banco de Dados
+
+Para popular o banco de dados remoto com dados iniciais (produtos, categorias, etc.):
+
+**Via GitHub Actions (recomendado para produção):**
+1. Acesse **Actions** → **Seed Supabase Database**
+2. Clique em **Run workflow**
+3. Escolha se deseja limpar dados existentes (padrão: não limpa)
+4. Execute o workflow
+
+**Secrets necessários:**
+- `SUPABASE_DB_PASSWORD`: Senha do banco de dados
+  - Obtenha em: Dashboard → Settings → Database → Database password
+
+**Local (desenvolvimento):**
+```bash
+# Limpa dados existentes e adiciona novos
+pnpm db:seed
+
+# Para não limpar dados existentes:
+CLEAR_EXISTING=false pnpm db:seed
+```
+
 ### Estrutura de Migrações
 
 - **Schema**: `src/lib/db/schema/` - Definições TypeScript do schema
 - **Migrações**: `drizzle/` - Arquivos SQL de migração gerados
+- **Seed**: `drizzle/seed.ts` - Script de seeding do banco
 - **Config**: `drizzle.config.ts` - Configuração do Drizzle Kit
 
 ## Estrutura de Pastas
