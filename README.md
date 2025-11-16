@@ -171,9 +171,15 @@ Para que as migrações automáticas funcionem, configure os seguintes secrets n
 
 1. `SUPABASE_ACCESS_TOKEN` - Token de acesso do Supabase
    - Obtenha em: https://supabase.com/dashboard/account/tokens
-2. `SUPABASE_PROJECT_REF` - Referência do projeto Supabase
-   - Encontre em: https://supabase.com/dashboard/project/_/settings/general
-   - Formato: `xxxxxxxxxxxxxx`
+   - Crie um novo token se necessário
+   
+2. `SUPABASE_PROJECT_REF` - Reference ID (ID de Referência) do projeto Supabase
+   - **O que é:** Identificador único do projeto (não é o Project ID)
+   - **Onde encontrar:**
+     - Dashboard → Settings → General → "Reference ID"
+     - Ou na URL do projeto: `https://supabase.com/dashboard/project/<reference-id>`
+   - **Formato:** Código alfanumérico (ex: `abcdefghijklmnop`)
+   - **Exemplo:** Se sua URL é `https://supabase.com/dashboard/project/abc123xyz`, então `abc123xyz` é o seu `SUPABASE_PROJECT_REF`
 
 ### Estrutura de Migrações
 

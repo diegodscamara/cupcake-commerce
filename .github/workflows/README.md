@@ -38,6 +38,21 @@ Configure no GitHub Settings → Secrets and variables → Actions:
 
 **SUPABASE_PROJECT_REF:**
 
-1. Acesse https://supabase.com/dashboard/project/_/settings/general
-2. Encontre o "Reference ID" do projeto
-3. Copie o ID e adicione como secret no GitHub
+O `SUPABASE_PROJECT_REF` é o **Reference ID** (ID de Referência) único do seu projeto Supabase. É diferente do Project ID.
+
+**Como encontrar:**
+
+1. **Via Dashboard:**
+   - Acesse https://supabase.com/dashboard
+   - Selecione seu projeto
+   - Vá em **Settings** → **General**
+   - Procure por **"Reference ID"** (geralmente um código alfanumérico como `abcdefghijklmnop`)
+
+2. **Via URL do projeto:**
+   - Quando estiver no dashboard do projeto, a URL será algo como:
+     `https://supabase.com/dashboard/project/abcdefghijklmnop`
+   - O código após `/project/` é o seu **Reference ID**
+
+3. Copie o Reference ID e adicione como secret no GitHub
+
+**Exemplo:** Se sua URL é `https://supabase.com/dashboard/project/abcdefghijklmnop`, então `abcdefghijklmnop` é o seu `SUPABASE_PROJECT_REF`
